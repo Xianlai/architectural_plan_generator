@@ -94,6 +94,7 @@ We represent the instances in this problem as follow:
 
 For geometrical instances, the attributes falls into 2 categories: states and stats. The methods also falls into 2 categories: actions that change the states and supporting methods that generate stats from states.
 
+For details of classes, see [Documentations](https://github.com/Xianlai/architectural_plan_generator/blob/Xianlai/Documentations.md)
 
 ### Procedure:
 - **Initiate k plans:** 
