@@ -1,5 +1,5 @@
-# NAR_Highrise plan:
-In this project, we are trying to implement an algorithm to automate the process of highrise floor plan design *(just core area for now)*. 
+# Architectural Plan Generator:
+In this project, we are trying to implement an algorithm to automate the process of architectural plan(or part of it like an apartment or highrise core area) design. 
 
 **Inputs:**
   1. Bounding box of floor
@@ -73,30 +73,30 @@ As we said, the higher objective value will be assigned to a plan achieve higher
 
 The **final objective function** will be a weighted linear combination of these objective values.
 
-### Instances
+## Instances
 There are in total three types of objects -**wall, room and plan**- ordered from low to high level exist in plan searching phase.
 
 
-#### Wall class:
+### Wall class:
 **class** ```Wall(ends, rooms)```    
 A wall object is identified by 2 end points, its opening and the 2 rooms it belongs to.
 
 **Inputs:**
-    - ends:
-    - rooms:
+    - ends:  
+    - rooms:  
 
 **Attributes:**
-    - Wall.id
-    - Wall.ends : $[(x\_0, y\_0), (x\_1, y\_1)]$
-    - Wall.rooms : which rooms(always 2 rooms) does this wall belong to
-    - Wall.normal : The normal direction of wall
-    - Wall.thickness : *not in use for now*
-    - Wall.opening : \[type, location\]. 
-        type $\in {0, 1, 2}$ corresponds to close, window, door.   
+    - Wall.id  
+    - Wall.ends : $[(x\_0, y\_0), (x\_1, y\_1)]$  
+    - Wall.rooms : which rooms(always 2 rooms) does this wall belong to  
+    - Wall.normal : The normal direction of wall  
+    - Wall.thickness : *not in use for now*  
+    - Wall.opening : \[type, location\].   
+        type $\in {0, 1, 2}$ corresponds to close, window, door.     
         location is the distance from first end point.
 
 **Methods:**
-    - add_thickness: add thickness based on wall type.
+    - add_thickness: add thickness based on wall type.  
 
 
 #### Room class:
@@ -104,19 +104,19 @@ A wall object is identified by 2 end points, its opening and the 2 rooms it belo
 A room is identified by a collection of walls. Wall is implemented in Wall class. When initializing, a room always starts from a 3 by 3 square consisted of 4 walls.
 
 **Inputs:**
-    - type: room type like hallway, service room, etc.
-    - id: room id which should be the same as its index in walls list
-    - walls: the walls enclose this room
+    - type: room type like hallway, service room, etc.  
+    - id: room id which should be the same as its index in walls list  
+    - walls: the walls enclose this room  
 
 **Attributes:**
-    - walls: the walls it has.
-    - type: room type
-    - id: room id
-    - stats: a dictionary of its properties like area, convexAspect, escapeDist, etc.
-    - adjacency: adjacent rooms and corresponding types
+    - walls: the walls it has.  
+    - type: room type  
+    - id: room id  
+    - stats: a dictionary of its properties like area, convexAspect, escapeDist, etc.  
+    - adjacency: adjacent rooms and corresponding types  
 
 **Methods:**
-    - update_stats: update the stats of this room given walls
+    - update_stats: update the stats of this room given walls  
 
 
 #### Plan class:
@@ -124,10 +124,9 @@ A room is identified by a collection of walls. Wall is implemented in Wall class
 A floor is identified by a collection of Room objects it contains. And it has some associated stats describing its properties like space efficiency, structure efficiency, escape distance etc.
 
 **Inputs:**
-    - rm_types: the types of rooms in function model
-    - rm_nums: the initial numbers of rooms corresponding to each type. (this 
-        number will change in search process)
-    - silent: do not print out the searching process
+    - rm_types: the types of rooms in function model  
+    - rm_nums: the initial numbers of rooms corresponding to each type. (this number will change in search process)  
+    - silent: do not print out the searching process  
 
 **Attributes:**
 - rooms
@@ -139,45 +138,45 @@ A floor is identified by a collection of Room objects it contains. And it has so
 ...]
 ```
 
-- walls: A flat list of all wall objects. (for plotting)
-- boundary: the boundary of plan area
-- bbox: the bounding box of this plan
-- stats: the stats of this plan
-    The stats is consisting of 3 types of properties comes from 3 types of constraints:
+- walls: A flat list of all wall objects. (for plotting)  
+- boundary: the boundary of plan area  
+- bbox: the bounding box of this plan  
+- stats: the stats of this plan  
+    The stats is consisting of 3 types of properties comes from 3 types of constraints:  
 
     1. functional:
-        + structureEfficiency
-        + spaceEfficiency
+        + structureEfficiency  
+        + spaceEfficiency  
         + ...
         
     2. code:
-        + escapeDist
+        + escapeDist  
         + ...
     
     3. physical:
-        + n_rooms_outOfBoundary
+        + n_rooms_outOfBoundary  
         + n_walls_overlap
-- objective: calculated from stats and objective function
+        
+- objective: calculated from stats and objective function  
 
 **Methods:**
-The methods include 
-- actions: changing the state of plans
-    - swap_room: swap the id and type of 2 rooms
-    - split_room(add_wall): add a wall somewhere in the middle
-    - remove_room(remove_wall): remove a wall between 2 rooms
-    - move_wall
-    - move_opening
-        move the location of opening on the wall.
-    - change_opening
-        change the opening type. Possible opening types: {0:'close', 1:'window', 2:'door'}
-    - ...
+- actions: changing the state of plans  
+    - swap_room: swap the id and type of 2 rooms  
+    - split_room(add_wall): add a wall somewhere in the middle  
+    - remove_room(remove_wall): remove a wall between 2 rooms  
+    - move_wall  
+    - move_opening  
+        move the location of opening on the wall.  
+    - change_opening  
+        change the opening type. Possible opening types: {0:'close', 1:'window', 2:'door'}  
+    - ...  
 
-- others: supporting funcitons
-    - initialize: initialize the plan based on room types and numbers in functional model.
-    - update_stats: Parse the state and return the stats
-    - evaluate: Use the objective function to evaluate the stats and return the objective value.
-    - plot: extract walls and openings from rooms and plot the plan
-    - print_stats: print the stats
+- others: supporting funcitons  
+    - initialize: initialize the plan based on room types and numbers in functional model.  
+    - update_stats: Parse the state and return the stats  
+    - evaluate: Use the objective function to evaluate the stats and return the objective value.  
+    - plot: extract walls and openings from rooms and plot the plan  
+    - print_stats: print the stats  
 
 
 
