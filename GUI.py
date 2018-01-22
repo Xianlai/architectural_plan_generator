@@ -19,23 +19,18 @@ Points = [Point_01, Point_02, Point_03, Point_04]
 win = GraphWin("My Window", 500, 500)
 win.setBackground(color_rgb(255,255,255))
 
-def random_move_x(point):
-	point.x = point.x + 5.0
-
-def random_move_y(point):
-	point.y = point.y + 5.0	
-
 def move_a_wall(walls):
 	#random pick a wall from the list:
 	the_wall = random.choice(walls)
 	i = walls.index(the_wall)
 
-	#random move the end points of the wall:	
-	random.choice([random_move_x, random_move_y])(the_wall[0])
-	random.choice([random_move_x, random_move_y])(the_wall[1])
+	#to understand if the wall is along x or y:
+	if i%2 == 0:
+		random.choice([move_up, move_down])(the_wall)
+	else:
+		random.choice([move_left, move_right])(the_wall)	
 
 	walls[i] = the_wall
-
 	return (walls)
 
 
@@ -46,12 +41,37 @@ def draw_walls(walls, canvas):
 		wall.draw(canvas)
 
 
+def move_left(wall):
+	wall[0].x = wall[0].x + 20.0
+	wall[1].x = wall[1].x + 20.0
+
+
+def move_right(wall):
+	wall[0].x = wall[0].x - 20.0
+	wall[1].x = wall[1].x - 20.0
+
+
+def move_up(wall):
+	wall[0].y = wall[0].y + 20.0
+	wall[1].y = wall[1].y + 20.0
+
+
+def move_down(wall):
+	wall[0].y = wall[0].y - 20.0
+	wall[1].y = wall[1].y - 20.0	
+
+def clear(canvas):
+    for item in canvas.items[:]:
+        item.undraw()
+    win.update()
+
 def main(walls, canvas):
-	for i in range(0, 9):
-		move_a_wall(walls)
+	for i in range(0, 19):
 		draw_walls(walls, canvas)
+		move_a_wall(walls)
 		
 		time.sleep(1)
+		clear(canvas)
 
 	return (walls)
 
