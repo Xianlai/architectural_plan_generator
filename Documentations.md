@@ -17,16 +17,19 @@ The methods also falls into 2 categories:
 
 ____
 ## Wall class
-The wall class implements the real word wall objects. It has states attributes like 2 end points, the opening, 2 rooms it belongs to, thickness, material etc. In the searching process, we will abstract it into a line with 2 end points, 1 opening and 2 owning rooms.
+The wall class implements the real-world wall objects. It has states attributes including the id, 2 end points, the opening, 2 rooms it belongs to, thickness, material etc. In the searching process, we will abstract it into a line with 1 id, 2 end points, 1 opening and 2 owning rooms. The other attributes will be implemented later when needed in other problems.
 
-**class** ```Wall(ends, rooms)```
+**class** ```Wall(id, ends, rooms)```
 
 #### Parameters:     
+- **id**: 
+    The wall id 
+
 - **ends**: 
-        a list of 2 end points. The points should be in order (left, right) or (upper, lower).    
+    a list of 2 end points. The points should be in order (left, right) or (upper, lower).    
 
 - **rooms**:   
-        a list of 2 rooms 
+    a list of 2 rooms 
 
 #### Attributes:
 - **``self.id``**: 
@@ -55,41 +58,41 @@ The wall class implements the real word wall objects. It has states attributes l
 
 #### Methods: 
 ```python
-- self.set_thickness()
+- self.parse()
 ```
 
 **``__init__(ends, rooms)``**  
     When initialize, the opening type is always 0 and location is 0.
     
-**``set_thickness()``**
-    Set thickness of wall based on self.type and self.material. (Not in use for now.)
+**``parse()``**
+    parse the states attributes to get stats attributes.
 
 
 ____
 ## Room class
-The room class implements the real word room objects. It has states attributes like a list of walls, the room function etc. And stats attribtues like room area, convex aspect ratio, etc. When initializing, a room always starts from a 3 by 3 square consisted of 4 walls.
+The room class implements the real-world room objects. It has states attributes include the id, the enclosing walls, the room function etc. And stats attribtues include room area, convex aspect ratio, etc. When initializing, a room always starts from a 3 by 3 square consisted of 4 walls without openings.
 
-**class** `Room(type, id, walls)` 
+**class** `Room(id, type, walls)` 
 
 #### Parameters: 
-- **function**: 
-    room function like hallway, service room, etc.
-
 - **id**: 
     room id which should be the same as its index in rooms list
+
+- **function**: 
+    room function like hallway, service room, etc.
 
 - **walls**: 
     the walls enclose this room
 
 #### Attributes:  
-- **``self.walls``**: 
-    the walls enclose this room 
+- **``self.id``**: 
+    room id  
 
 - **``self.function``**: 
     The room function 
 
-- **``self.id``**: 
-    room id  
+- **``self.walls``**: 
+    the walls enclose this room 
 
 - **``self.stats``**: 
     The stats of this room is encoded as a dictionary. The keys include:
@@ -97,22 +100,22 @@ The room class implements the real word room objects. It has states attributes l
     + area
     + convexAspect
     + escapeDist
-
+    + center
 
 #### Methods: 
 ```python
-- self.update_stats()
+- self.parse()
 ```
 
-**``__init__(function, id, walls)``**  
+**``__init__(id, function, walls)``**  
 
-**``self.update_stats()``**      
-    update the stats of this room given states attribute.
+**``self.parse()``**      
+    parse the stats of this room given states
 
 
 -----
 ## Plan Class
-The plan class implements the real word plan objects. It has states attributes like a list of rooms, the boundary etc. And stats attribtues like total area, space efficiency etc.
+The plan class implements the real-world plan objects. It has states attributes include the rooms in it , its boundary etc. And stats attribtues include total area, space efficiency etc.
 
 **class** `Plan(rm_functions, rm_nums, silent=False)`  
 
@@ -129,20 +132,15 @@ number will change in search process)
 
 #### Attributes: 
 - **``self.rooms``**: 
-    Each plan has a list of m dictionaries corresponding to m types in typical highrise like the one below (m depends on how many types are found in learning dataset). Each dictionary contains a number of rooms of same type and could be empty.
-    ```
-    [
-    {'type':'mr', 'rooms':[mr_00, mr_01, mr_02], 'number':3},
-    {'type':'wr', 'rooms':[wr_00, wr_01, wr_02, wr_03], 'number':4},
-    ...
-    ] 
-    ```
+    a list of rooms in this plan
 
 - **``self.boundary``**: 
     the boundary of plan area
 
 - **``self.stats``**: 
     The stats of this plan is encoded as a dictionary. The keys include:
+    + rm_functions
+    + rm_nums
     + walls: A flat list of all wall objects. (for plotting)
     + structureEfficiency
     + spaceEfficiency
@@ -155,7 +153,7 @@ number will change in search process)
 ```python
 # Actions: changing the state of plans
 - self._initialize()
-- self.swap_room()   
+- self.swap_rooms()   
 - self.split_room()  
 - self.remove_room()  
 - self.move_wall()
@@ -163,7 +161,7 @@ number will change in search process)
 - self.change_opening()  
 
 # Supporting methods:
-- self.update_stats()
+- self.parse()
 - self.evaluate()
 - self.plot()
 - self.print_stats()
@@ -174,14 +172,14 @@ number will change in search process)
 **``initialize()``**    
     Initialize the plan with given room functions and numbers.
 
-**``swap_room()``**    
-    swap the id and type of 2 rooms
+**``swap_rooms()``**    
+    Awap the id and type of 2 rooms
 
 **``split_room()``**  
-    add a wall somewhere in the middle  
+    Add a wall somewhere in the middle of a room. 
 
 **``remove_room()``**  
-    remove a wall between 2 rooms
+    Remove a wall between 2 rooms
 
 **``move_wall()``**  
     There are multiple situations in this action  
@@ -194,14 +192,14 @@ number will change in search process)
     `{0:’close’, 1:’window’, 2:’door’}`
  
 
-**``update_stats()``**    
+**``parse()``**    
     Parse the state and return the stats
 
 **``evaluate()``**    
     Use the objective function to evaluate the stats and return the objective value.
 
 **``plot()``**    
-    extract walls and openings from rooms and plot the plan
+    Plot the rooms' tags, walls and openings.
 
 **``print_stats()``**    
     print the stats
@@ -209,7 +207,7 @@ number will change in search process)
 
 
 ____
-## Objective class
+## Objectives class
 objective function and constraints
 
 

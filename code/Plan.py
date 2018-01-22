@@ -1,87 +1,150 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 """ 
-This script implements the Floor class.
+This script implements the Plan class.
 
 Author: Xian Lai
 Date: Dec.21, 2017
 """
-from math import factorial as f
-from collections import Counter
-from LocalSearch import LocalSearch
-from Evaluator import Evaluator
-import random
+
 
 from Room import Room
 from Wall import Wall
 
 
-class Floor(object):
+class Plan(object):
 
 	"""
-	This class defines floor objects for high-rise office buildings.(For now, 
-    it just means cores) A floor is identified by a collection of Room objects 
-    it contains. And it has some associated stats describing its properties 
-    like space efficiency, escape distance etc.
+	The plan class implements the real-world plan objects. It has states 
+    attributes rooms. And stats attribtues include total area, space 
+    efficiency etc.
 
     Inputs:
     -------
-    - rm_type: the types of rooms in function model
-    - rm_num: the initial numbers of rooms corresponding to each type. (this 
-        number will change in search process)
+    - rm_functions: All the room functions exist in function model
+    - rm_num: the initial numbers of rooms corresponding to each function. 
+        (this number will change in search process)
     - silent: do not print out the searching process
 
 	Attributes:
 	-----------
-	- state: the rooms in this floor
-	- stats: a dictionary of properties of this floor
+	- rooms: the rooms in this plan
+    - silent
+	- stats: a dictionary of properties of this plan:
+        {
+         'rm_functions': ['mr', 'wr', 'el', ...],
+         'rm_nums': [0, 1, 2, ...],
+         'walls': [],
+         'total_area': 100.0,
+         'n_rm_outOfBound': 0,
+         'space_eff': 0.4, 
+         'objective': 100.0
+         ...
+        }
 
 	Methods:
 	--------
+    # actions:
 	- initialize: initialize a floor with sampled room types and numbers and 
         random assigned room locations and areas.
-	- update_stats: calculate and update the stats based on current state.
-	- swap_rooms: swap the name of 2 rooms
-	- change_room: change 1 room by doing any of the following: moving one of 
-        its walls, move one portion of the wall(require the wall be to split 
-        first) or move its openings.
+    - swap_rooms: swap the id and type of 2 rooms
+    - split_room: add a wall somewhere in the middle of a room
+    - remove_room: remove a wall between 2 rooms
+    - move_wall: There are multiple situations in this action  
+    - move_opening: move the location of opening on the wall. 
+    - change_opening: change the opening type. Possible opening types: 
+        {0:’close’, 1:’window’, 2:’door’}
+
+    # supporting methods:
+	- parse: parse stats from states
+	- evaluate: Use the objective function to evaluate the stats and return 
+        the objective value.
+	- plot: extract walls and openings from rooms and plot the plan
+    - print_stats: print the stats
     """
 
-    def __init__(self, rm_type=[], rm_num=[], silent=False):
-        """ Initialize a floor objects with given room types and numbers.
-
+    def __init__(self, rm_functions, rm_nums, silent=False):
+        """ 
         """
-        self.initialize()
-        self.stats  = {'rm_types':rm_type, 'rm_nums':rm_num}
-        self.state  = []
         self.silent = silent
-        self.objVal = 0
+        self.rooms = []
+        self.initialize(rm_functions, rm_nums)
+        self.stats  = {
+            'rm_functions':rm_functions, 
+            'rm_nums':rm_nums,
+            'walls': [],
+            'total_area': 100.0,
+            'n_rm_outOfBound': 0,
+            'space_eff': 0.4, 
+            'objective': 100.0
+        }
         
 
-    def initialize(self):
-        """ Initialize the plan with rooms and walls. Return the init_state.
+    def initialize(self, rm_functions, rm_nums):
+        """ Initialize a plan with given room functions and room numbers.
         """
         # determine the number of room types in the plan
         # initialize all the rooms as 3.0*3.0 squares, each type in a row.
-        type_num = len(self.stats['rm_types'])
-        _ = (self.stats['rm_types'], self.stats['rm_nums'], range(type_num))
+        n_functions = len(rm_functions)
+        _ = (rm_functions, rm_nums, range(n_functions))
         for typ, num, r in zip(_):
         	for q in range(num):
         		cnrs = [(3.0*q, 3.0*r + 3), (3.0*q + 3, 3.0*r + 3), 
         				(3.0*q, 3.0*r), (3.0*q + 3, 3.0*r)]
         		walls = [Wall() for cnr in cnrs]
         		room = Room(rm_type=typ, rm_id=typ+'_'+str(i), walls=walls)
-        		self.state.append(room)
+        		self.rooms.append(room)
         
         # parse the state of this plan and evaluate the score.
         self.parse()
         self.evaluate()
 
 
-    def parse(self, ):
+    def swap_rooms(self,):
+        """ Swap the id and type of 2 rooms
+        """
+        
+        pass
+
+
+    def split_room(self,):
+        """ Add a wall somewhere in the middle of a room. 
+        """
+        
+        pass
+
+
+    def remove_room(self,):
+        """ Remove a wall between 2 rooms.
+        """
+        
+        pass
+
+
+    def move_wall(self,):
+        """ Move a selected wall.
+        There are multiple situations in this action 
+        """
+        
+        pass
+
+
+    def move_opening(self,):
+        """ Move the location of opening on the wall. 
+        """
+        
+        pass
+
+
+    def change_opening(self,):
+        """ Change the opening type
+        """
+        
+        pass
+
+
+    def parse(self,):
         """ Parse the state and return the stats.
-        Besides the init stats room types and room numbers, the stats contains
-        predefined features like space efficiency, escape distance etc.
     	"""
         
         pass
@@ -95,20 +158,14 @@ class Floor(object):
     	pass
   
 
-    def output_rooms(self,):
-        """ output the room'id and their walls's ends, opening for drawing.
+    def plot(self,):
+        """ Plot the rooms' tags, walls and openings.
         """
         pass
 
 
-
-    def output_stats(self,):
+    def print_stats(self,):
         """
-        """
-        pass
-
-    def draw_rooms(self,):
-        """ output the room'id and their walls's ends, opening for drawing.
         """
         pass
 
