@@ -118,8 +118,8 @@ class Plan(object):
             for wall_1 in self.walls:
                 if wall_0 is not wall_1:
                     if wall_0 == wall_1:
-                        wall_0.stats['same'] = wall_1.rid
-                        wall_1.stats['same'] = wall_0.rid
+                        wall_0.stats['same'] = wall_1
+                        wall_1.stats['same'] = wall_0
 
 
 

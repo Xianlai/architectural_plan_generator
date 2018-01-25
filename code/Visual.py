@@ -69,6 +69,8 @@ class _BasePlot():
     def _set_axParam(self, ax, show_grid=True):
         """ Set parameters of given ax
         """
+        ax.set_aspect('equal')
+        
         # hide axis ticks
         ax.tick_params(
             axis="both", which="both", bottom="off", top="off", 

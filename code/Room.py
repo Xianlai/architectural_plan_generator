@@ -49,28 +49,36 @@ class Room(Polygon):
         """ 
         """
         Polygon.__init__(self, [wall.coords[0] for wall in walls])
-        print("corners:", [wall.coords[0] for wall in walls])
-        self.rid  = rid
-        self.func = function
+        self.rid   = rid
+        self.func  = function
+        self.walls = walls
         self.parse()
         
 
     def parse(self, ):
         """
         """
-        minx, miny, maxx, maxy = self.bounds
-        aspect = (maxx-minx)/(maxy-miny)
-        corners = list(self.exterior.coords)
-
         self.stats = {
-            'corners': corners,
-            'area':self.area, 
-            'convexAspect':max(aspect, 1/aspect), 
-            'adjacency':([], []), 
-            'center':self.centroid, 
+            'area':self.area,
+            'center':self.centroid,
+            'convexAspect':calc_convex_aspect(self.bounds),
+            'adjacency':[wall.stats['same'].rid for wall in self.walls \
+                if wall.stats['same'] != None],
             'escapeDist':0.0
         }
         print(self.stats)
+
+
+
+
+
+
+def calc_convex_aspect(bounds):
+    """
+    """
+    minx, miny, maxx, maxy = bounds
+    aspect = (maxx-minx)/(maxy-miny)
+    return max(aspect, 1/aspect)
 
 
 
