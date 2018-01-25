@@ -9,9 +9,9 @@ Date: Dec.21, 2017
 
 
 from Wall import Wall
+from shapely.geometry import Point, LineString, Polygon
 
-
-class Room(object):
+class Room(Polygon):
 
     """
     The room class implements the real-world room objects. It has states 
@@ -48,24 +48,44 @@ class Room(object):
     def __init__(self, rid, function, walls):
         """ 
         """
-        self.rid      = rid
-        self.function = function
-        self.walls    = walls
-        self.stats    = {
-            'area':0.0, 'convexAspect':0.0, 'adjacency':([], []), 
-            'center':(0, 0), 'escapeDist':0.0
-        }
-
+        Polygon.__init__(self, [wall.coords[0] for wall in walls])
+        print("corners:", [wall.coords[0] for wall in walls])
+        self.rid  = rid
+        self.func = function
+        self.parse()
+        
 
     def parse(self, ):
         """
         """
-        pass
+        minx, miny, maxx, maxy = self.bounds
+        aspect = (maxx-minx)/(maxy-miny)
+        corners = list(self.exterior.coords)
+
+        self.stats = {
+            'corners': corners,
+            'area':self.area, 
+            'convexAspect':max(aspect, 1/aspect), 
+            'adjacency':([], []), 
+            'center':self.centroid, 
+            'escapeDist':0.0
+        }
+        print(self.stats)
+
 
 
 def main():
+    wall_0 = Wall(wid=0, rid=0, ends=((0, 0), (0, 1)))
+    wall_1 = Wall(wid=1, rid=0, ends=((0, 1), (1, 1)))
+    wall_2 = Wall(wid=1, rid=0, ends=((1, 1), (1, 0)))
+    wall_3 = Wall(wid=1, rid=0, ends=((1, 0), (0, 0)))
 
-    pass
+    walls = [wall_0, wall_1, wall_2, wall_3]
+    room = Room(rid=0, function='test', walls=walls)
+    print(room.area)
+    print(room.length)
+    print(list(room.exterior.coords))
+
 
 if __name__ == "__main__":
     main()

@@ -7,15 +7,17 @@ Author: Xian Lai
 Date: Dec.21, 2017
 """
 
-
+import numpy as np
+from shapely.geometry import Point, LineString, Polygon
 from Room import Room
 from Wall import Wall
+from Visual import SingleAxPlot
 
 
 class Plan(object):
 
-	"""
-	The plan class implements the real-world plan objects. It has states 
+    """
+    The plan class implements the real-world plan objects. It has states 
     attributes rooms. And stats attribtues include total area, space 
     efficiency etc.
 
@@ -26,11 +28,12 @@ class Plan(object):
         (this number will change in search process)
     - silent: do not print out the searching process
 
-	Attributes:
-	-----------
-	- rooms: the rooms in this plan
-    - silent
-	- stats: a dictionary of properties of this plan:
+    Attributes:
+    -----------
+    - walls: the walls in this plan
+    - rooms: the rooms in this plan
+    - silent: do not plot plans or print stats in the middle of searching
+    - stats: a dictionary of properties of this plan:
         {
          'rm_functions': ['mr', 'wr', 'el', ...],
          'rm_nums': [0, 1, 2, ...],
@@ -42,11 +45,10 @@ class Plan(object):
          ...
         }
 
-	Methods:
-	--------
+    Methods:
+    --------
     # actions:
-	- initialize: initialize a floor with sampled room types and numbers and 
-        random assigned room locations and areas.
+    - initialize: initialize a floor with given room functions and numbers.
     - swap_rooms: swap the id and type of 2 rooms
     - split_room: add a wall somewhere in the middle of a room
     - remove_room: remove a wall between 2 rooms
@@ -56,50 +58,111 @@ class Plan(object):
         {0:’close’, 1:’window’, 2:’door’}
 
     # supporting methods:
-	- parse: parse stats from states
-	- evaluate: Use the objective function to evaluate the stats and return 
+    - parse: parse stats from states
+    - evaluate: Use the objective function to evaluate the stats and return 
         the objective value.
-	- plot: extract walls and openings from rooms and plot the plan
+    - plot: extract walls and openings from rooms and plot the plan
     - print_stats: print the stats
     """
 
     def __init__(self, rm_functions, rm_nums, silent=False):
         """ 
         """
-        self.silent = silent
-        self.rooms = []
+        self.silent   = silent 
+        self.rm_func  = rm_functions
+        self.rm_nums  = rm_nums
+        self.walls    = []
+        self.rooms    = []
+        self.wall_cnt = 0
+        self.room_cnt = 0
         self.initialize(rm_functions, rm_nums)
-        self.stats  = {
-            'rm_functions':rm_functions, 
-            'rm_nums':rm_nums,
-            'walls': [],
-            'total_area': 100.0,
-            'n_rm_outOfBound': 0,
-            'space_eff': 0.4, 
-            'objective': 100.0
-        }
+        
         
 
     def initialize(self, rm_functions, rm_nums):
         """ Initialize a plan with given room functions and room numbers.
         """
-        # determine the number of room types in the plan
         # initialize all the rooms as 3.0*3.0 squares, each type in a row.
-        n_functions = len(rm_functions)
-        _ = (rm_functions, rm_nums, range(n_functions))
-        for typ, num, r in zip(_):
-        	for q in range(num):
-        		cnrs = [(3.0*q, 3.0*r + 3), (3.0*q + 3, 3.0*r + 3), 
-        				(3.0*q, 3.0*r), (3.0*q + 3, 3.0*r)]
-        		walls = [Wall() for cnr in cnrs]
-        		room = Room(rm_type=typ, rm_id=typ+'_'+str(i), walls=walls)
-        		self.rooms.append(room)
+        for func, num, r in zip(rm_functions, rm_nums, range(len(rm_nums))):
+            for q in range(num):
+                rid = self.wall_cnt
+
+                # initiate 4 walls for this room
+                cnrs = [
+                    (3.0*q, 3.0*r),         (3.0*q, 3.0*r + 3), 
+                    (3.0*q + 3, 3.0*r + 3), (3.0*q + 3, 3.0*r)
+                ]
+                for i in range(-1, 3):
+                    ends = (cnrs[i], cnrs[i+1])
+                    wid  = self.wall_cnt
+                    self.walls.append(Wall(ends=ends, wid=wid, rid=rid))
+                    self.wall_cnt += 1
+
+                # initiate a room
+                room = Room(rid=rid, function=func, walls=self.walls[-4:])
+                self.rooms.append(room)
+                self.wall_cnt += 1
         
-        # parse the state of this plan and evaluate the score.
+        self.check_sharing_walls()
         self.parse()
         self.evaluate()
+        for room in self.rooms:
+            print(room.exterior.coords)
+        self.plot()
 
 
+    def check_sharing_walls(self, ):
+        """
+        """
+        for wall_0 in self.walls:
+            for wall_1 in self.walls:
+                if wall_0 is not wall_1:
+                    if wall_0 == wall_1:
+                        wall_0.stats['same'] = wall_1.rid
+                        wall_1.stats['same'] = wall_0.rid
+
+
+
+    def parse(self,):
+        """ Parse the state and return the stats.
+        """
+        self.stats  = {
+            'rm_areas':[],
+            'fl_area': 100.0,
+            'n_rm_outOfBound': 0,
+            'space_eff': 0.4, 
+            'objective': 100.0
+        }
+
+
+    def evaluate(self, ):
+        """ Use the objective function to evaluate the stats and return the
+        objective value.
+        """
+        
+        pass
+  
+
+    def plot(self,):
+        """ Plot the rooms' tags, walls and openings.
+        """
+        xy = [list(zip(wall.coords[0], wall.coords[1])) for wall in self.walls]
+        X = [x[0] for x in xy]
+        Y = [y[1] for y in xy]
+
+        p = SingleAxPlot(figsize=(6,6))
+        p.plot_lines(X, Y, title='Floor Plan', show=False)
+        p.show()
+        
+
+
+
+    def print_stats(self,):
+        """
+        """
+        pass
+
+    # ---------------------------- actions -----------------------------------
     def swap_rooms(self,):
         """ Swap the id and type of 2 rooms
         """
@@ -143,36 +206,12 @@ class Plan(object):
         pass
 
 
-    def parse(self,):
-        """ Parse the state and return the stats.
-    	"""
-        
-        pass
-
-
-    def evaluate(self, ):
-        """ Use the objective function to evaluate the stats and return the
-    	objective value.
-    	"""
-        
-    	pass
-  
-
-    def plot(self,):
-        """ Plot the rooms' tags, walls and openings.
-        """
-        pass
-
-
-    def print_stats(self,):
-        """
-        """
-        pass
-
-
 def main():
+    rm_functions = ['men\'s_room', 'women\'s_room', 'service_room']
+    rm_nums = [2, 3, 4]
+    p = Plan(rm_functions=rm_functions, rm_nums=rm_nums)
 
-    pass
+
 
 if __name__ == "__main__":
     main()
