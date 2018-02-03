@@ -11,6 +11,7 @@ Date: Jan.23, 2017
 
 from matplotlib import pyplot as plt
 import matplotlib as mpl
+from descartes import PolygonPatch
 
 from matplotlib import gridspec
 from matplotlib.colors import ListedColormap
@@ -65,6 +66,9 @@ class _BasePlot():
         plt.rcParams['axes.facecolor']   = grey[background]
         plt.rcParams['figure.facecolor'] = grey[background]
 
+        # set interactive mode on so the plotting won't block process
+        plt.ion()
+        
 
     def _set_axParam(self, ax, show_grid=True):
         """ Set parameters of given ax
@@ -103,8 +107,31 @@ class _BasePlot():
         return ax
 
 
+    def _plot_patch(self, ax, patch, color):
+        """
+        """
+        ax.add_patch(PolygonPatch(patch, fc=color))
+
+        return ax
+
+
+    def _plot_label(self, ax, label, point):
+        """
+        """
+        bbox_props = dict(boxstyle="square,pad=0.3", fc="w", lw=0, alpha=0.2)
+        ax.text(point.x, point.y, label, fontdict=font['small'], bbox=bbox_props)
+
+        return ax
+
+
     @staticmethod
     def show():
+        plt.show()
+
+
+    @staticmethod
+    def ioff():
+        plt.ioff()
         plt.show()
     
 
@@ -143,6 +170,35 @@ class SingleAxPlot(_BasePlot):
         if show: plt.show()
 
 
+    def plot_plan_intermediate(self, centers, functions, patches, colors, 
+            title="intermediate plan", show=True):
+        """ Plot the intermediate plan in process of searching.
+        This intermediate plan only includes color patch and room function 
+        label for each room.
+        """
+        self.axes.patches = []
+        self.axes.texts   = []
+
+        for patch, color in zip(patches, colors):
+            self.axes = self._plot_patch(self.axes, patch, color)
+        for function, center in zip(functions, centers):
+            self.axes = self._plot_label(self.axes, function, center)
+
+        self.axes.set_xlim(-1, 6)
+        self.axes.set_ylim(-1, 6)
+        
+        plt.pause(2)
+
+
+    def plot_plan_final(self, centers, functions, patches, colors, 
+            title="intermediate plan", show=True):
+        """ Plot the intermediate plan in process of searching.
+        This intermediate plan only includes color patch and room function 
+        label for each room.
+        """
+        pass
+
+
 
 def main():
     params={'figsize':(6,6), 'background':'white', 'show_grid':False}
@@ -151,5 +207,20 @@ def main():
 
 if __name__ == "__main__": main()
 
+"""
+fig, ax = plt.subplots()
+line, = ax.plot(np.random.randn(100))
+plt.show(block=False)
 
+tstart = time.time()
+num_plots = 0
+while time.time()-tstart < 5:
+    line.set_ydata(np.random.randn(100))
+    ax.draw_artist(ax.patch)
+    ax.draw_artist(line)
+    fig.canvas.update()
+    fig.canvas.flush_events()
+    num_plots += 1
+print(num_plots/5)
+"""
 

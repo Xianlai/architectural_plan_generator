@@ -36,6 +36,7 @@ class Wall(LineString):
         thickness: (Not in use for now.) 
         material: (Not in use for now.)
         }
+    - types: {"wall":0, "window":1, "door":2, "entrance":3}
 
     Methods:
     --------
