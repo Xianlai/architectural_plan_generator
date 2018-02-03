@@ -354,8 +354,11 @@ class Plan(object):
         # find outward grids of boundary grids of the picked room
         # randomly select a consecutive portion of outward grids
         room = self._pick_a_room()
+        print("Pick room: %d" % room.rid)
         _, outward_xys = room.find_boundary_xys(self.xys)
-        if len(outward_xys) == 0: return
+        if len(outward_xys) == 0: 
+            print("This room has no outward xys.")
+            return
         outward_xys = self._slice_a_subsequence(outward_xys)
 
         # update grids and rooms
@@ -366,9 +369,13 @@ class Plan(object):
             room.xys += xys
             # remove this xy from its corresponding outward room
             for xy in xys: self.rooms[rid].xys.remove(xy)
+            print(xys, "in Room %d is taken by this expand" % rid)
+            print(self.rooms[rid].xys, "is the xys left in this room.")
             # if the outward room's xys list is empty after removing, change 
             # this room to None.
-            if not self.rooms[rid].xys: self.rooms[rid] = None
+            if not self.rooms[rid].xys: 
+                print("Room %d is eaten up by this expand" % rid)
+                self.rooms[rid] = None
             # if the outward room's xys list doesn't parse to a single Polygon 
             # which means it's split by this expand action, split it to 2 rooms
             else: self._check_continuous(self.rooms[rid])
@@ -418,7 +425,9 @@ class Plan(object):
         # move connecting xys into a new group
         # if old group is empty, then xys is continuous, change nothing
         group_new, group_old = self._split_group(xys)
-        if group_old == []: return
+        if group_old == []: 
+            print("Room %d is still a whole piece" % room.rid)
+            return
 
         # otherwise, keep spliting xys until old group is empty.
         # the new groups are the xys for new rooms
@@ -436,7 +445,7 @@ class Plan(object):
                 xys=group
             )
             self.rooms.append(room_new)
-
+            print("Room %d is split out" % room_new.rid)
             # update the rid of xys
             for xy in group:
                 self.grids[xy].rid = self.room_count
@@ -486,6 +495,8 @@ class Plan(object):
         room_2 = self._pick_a_room()
         while room_2 is room_1: room_2 = self._pick_a_room()
 
+        print("Pick 2 rooms: %d and %d" % (room_1.rid, room_2.rid))
+        print("Swap functions: %s and %s" % (room_1.function, room_2.function))
         room_1.function, room_2.function = room_2.function, room_1.function
 
 
@@ -497,11 +508,14 @@ class Plan(object):
         """
         room = self._pick_a_room()
         axis = random_pick(['x', 'y'])
+        print("Split room:", room.rid)
 
         # randomly pick a split line
         left  = room.stats["min_"+axis] + 0.5
         right = room.stats["max_"+axis] - 0.5
-        if right - left == 0: return
+        if right - left == 0: 
+            print("This room has width 1 at axis %s" % axis)
+            return
         split_line = random_pick(np.arange(left, right))
 
         # split the grids
@@ -525,6 +539,8 @@ class Plan(object):
         for xy in xys_1: self.grids[xy].rid = room_1.rid
         for xy in xys_2: self.grids[xy].rid = room_2.rid
 
+        print("Into 2 rooms: %d and %d" % (room_1.rid, room_2.rid))
+
 
 
     def _merge(self, ):
@@ -543,7 +559,9 @@ class Plan(object):
         # purge the function without adjacent pairs
         # if no function contains adjacent pairs, exit this action.
         pairs = purge_dict(pairs)
-        if not pairs: return
+        if not pairs: 
+            print("No pairs of adjacent same-function rooms found.")
+            return
 
         # randomly pick a function by weighting. (we may want to using weights
         # to control the chance of merge for different room function)
@@ -561,11 +579,14 @@ class Plan(object):
             xys=self.rooms[picked_pair[0]].xys + self.rooms[picked_pair[1]].xys
         )
         self.room_count += 1
+        print("Merge rooms %d and %d" % (self.rooms[picked_pair[0]].rid,
+            self.rooms[picked_pair[1]].rid))
 
         # update self.rooms
         self.rooms[picked_pair[0]] = None
         self.rooms[picked_pair[1]] = None
         self.rooms.append(room_new)
+        print("into room %d" % room_new.rid)
 
         # update the rid of merged xys
         for xy in room_new.xys:
@@ -661,8 +682,7 @@ def main():
             },
     }
     plan = Plan(function_params=function_params, grid_coords=grid_coords)
-    plan.random_walk(iters=4)
-
+    plan.random_walk(iters=40)
 
 
 
