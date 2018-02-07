@@ -167,12 +167,12 @@ class Transition(object):
             plan (Plan): the plan those xys belong to
 
         """
-        groups = {}
-
-        for xy in xys:
-            key = plan.grids[xy].rid
-            if key not in groups: groups[key] = [xy]
-            else: groups[key].append(xy)
+        # group the xys by their rid
+        groups = defaultdict(list)
+        for xy in xys: groups[plan.grids[xy].rid].append(xy)
+        
+        # remove duplicated xys in the groups
+        for k, v in groups.items(): groups[k] = list(set(v))
 
         return groups
 
