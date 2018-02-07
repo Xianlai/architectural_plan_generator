@@ -19,6 +19,26 @@ This project is consisted of 4 phases or problems: **datasets collecting**, **cr
 - **Searching** 
     Initialize a plan and then strategically change the state by apply actions like expand, split, merge, swap rooms etc to achieve a better score calculated by objective function.
 
+
+# Script Files
+
+**architectural_plan_generator.py**: This is the entry point of this project. Run this file to get agent started.
+
+- **Geometrical Classes:**  
+    - **Plan.py**: The file implements plan objects and associated methods.
+    - **Room.py**: The file implements room objects and associated methods. 
+    - **Grid.py**: The file implements grid objects and associated methods
+    - **Wall.py**: The file implements wall objects and associated methods
+
+- **Non-geometrical Classes**  
+    - **ObjectiveFunction.py**: objective function and constraints
+    - **FunctionModel.py**: function model learned from criteria learning part.
+    - **Transition.py**: the class implements the transition model and available actions.
+
+
+For details of classes, see [Documentations](https://github.com/Xianlai/architectural_plan_generator/blob/Xianlai/Documentations.md)
+
+
 # Dataset Collecting
 pass
 
@@ -70,33 +90,6 @@ The final objective function will be a weighted linear combination of these obje
 
 # Searching
 Given the objective function, we want to find a plan state with high objective value. We can use different searching strategies in local search domain.
-
-# Script Files
-
-**architectural_plan_generator.py**: This is the entry point of this project. Run this file to get agent started.
-
-- **Geometrical Classes:**  
-    - **Plan.py**: The file implements plan objects and associated methods.
-    - **Room.py**: The file implements room objects and associated methods. 
-    - **Grid.py**: The file implements grid objects and associated methods
-    - **Wall.py**: The file implements wall objects and associated methods
-
-- **Non-geometrical Classes**  
-    - **ObjectiveFunction.py**: objective function and constraints
-    - **FunctionModel.py**: function model learned from criteria learning part.
-    - **Transition.py**: the class implements the transition model and available actions.
-
-
-For details of classes, see [Documentations](https://github.com/Xianlai/architectural_plan_generator/blob/Xianlai/Documentations.md)
-
-
-
-
-
-
-
-
-
 
 
 
