@@ -19,6 +19,9 @@ flatten = lambda l: list(set([item for sublist in l for item in sublist]))
 def calc_convex_aspect(bounds):
     """ Find the convex aspect ratio of a rectangle given the bounds of this
     rectangle.
+
+    Args:
+        bounds (tuple): the bounding x and y values.
     """
     minx, miny, maxx, maxy = bounds
     aspect = (maxx - minx) / (maxy - miny)
@@ -48,9 +51,11 @@ class Room(Polygon):
         {
         'area':0,
         'convexAspect':0.0,
-        'adjacency':[rooms, functions],
-        'escapeDist':0,
         'center': the center point of room for adding room tags,
+        'min_x': minimal x value,
+        'max_x': maximal x value,
+        'min_y': minimal y value,
+        'max_y': maximal y value,
         }
 
     Methods:

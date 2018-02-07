@@ -14,7 +14,9 @@ import matplotlib as mpl
 from descartes import PolygonPatch
 
 from matplotlib import gridspec
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, Normalize
+from matplotlib import cm
+
 # import seaborn as sns; sns.set()
 # %matplotlib inline 
 from pprint import pprint
@@ -49,6 +51,7 @@ grey = {
 }
 DC   = {'blue':'#448afc', 'red':'#ed6a6a', 'green':'#80f442'}
 DCM  = ListedColormap(DC.values())
+CM   = cm.get_cmap('Spectral')
 
 
 class _BasePlot():
@@ -73,6 +76,8 @@ class _BasePlot():
     def _set_axParam(self, ax, show_grid=True):
         """ Set parameters of given ax
         """
+        ax.set_xlim(self.xlim)
+        ax.set_ylim(self.ylim)
         ax.set_aspect('equal')
         
         # hide axis ticks
@@ -142,11 +147,14 @@ class SingleAxPlot(_BasePlot):
     the plotting figure with a single ax.
     """
 
-    def __init__(self, figsize=(12,6), background='white', show_grid=False):
+    def __init__(self, xy_lims, figsize=(8,8), background='white', 
+            show_grid=False):
         """ initialize the single plot object
         """
         _BasePlot.__init__(self, background=background)
+        self.xlim, self.ylim = xy_lims
         self.fig, self.axes = self._plot_base(figsize, show_grid)
+
         if not show_grid: self.axes.grid(b=None)
         
 
@@ -183,44 +191,12 @@ class SingleAxPlot(_BasePlot):
             self.axes = self._plot_patch(self.axes, patch, color)
         for function, center in zip(functions, centers):
             self.axes = self._plot_label(self.axes, function, center)
-
-        self.axes.set_xlim(-1, 6)
-        self.axes.set_ylim(-1, 6)
         
         plt.pause(2)
 
 
-    def plot_plan_final(self, centers, functions, patches, colors, 
-            title="intermediate plan", show=True):
-        """ Plot the intermediate plan in process of searching.
-        This intermediate plan only includes color patch and room function 
-        label for each room.
-        """
-        pass
-
-
 
 def main():
-    params={'figsize':(6,6), 'background':'white', 'show_grid':False}
-    sp = SinglePlot(**params)
-    sp.plot_lines(np.array([1,2,3,4,5,6]), np.array([2,3,4,5,6,7]), "title")
+    pass
 
 if __name__ == "__main__": main()
-
-"""
-fig, ax = plt.subplots()
-line, = ax.plot(np.random.randn(100))
-plt.show(block=False)
-
-tstart = time.time()
-num_plots = 0
-while time.time()-tstart < 5:
-    line.set_ydata(np.random.randn(100))
-    ax.draw_artist(ax.patch)
-    ax.draw_artist(line)
-    fig.canvas.update()
-    fig.canvas.flush_events()
-    num_plots += 1
-print(num_plots/5)
-"""
-
